@@ -1,0 +1,13 @@
+[package]
+name = "k2"
+version = "0.1.0"
+authors = ["Gabriela Alexandra Moldovan <gabi_250@live.com>"]
+edition = "2018"
+
+[lib]
+name = "k2"
+path = "src/lib.rs"
+
+[dependencies]
+clap = "2.33.0"
+which = "2.0.1"
