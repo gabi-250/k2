@@ -8,11 +8,14 @@
 // at your option. This file may not be copied, modified, or distributed except according to those
 // terms.
 
-use std::{collections::HashMap, path::PathBuf};
+use crate::benchmark::Benchmark;
+
+use std::{collections::HashMap, path::PathBuf, process::Command};
 
 pub trait LangImpl {
     fn results_key(&self) -> &str;
-    fn invoke(&self);
+    /// Run the language implementation on the specified benchmark.
+    fn invoke(&self, benchmark: &Benchmark);
 }
 
 pub struct GenericScriptingVm {
@@ -43,8 +46,13 @@ impl LangImpl for GenericScriptingVm {
             .expect("The path should be valid unicode!")
     }
 
-    fn invoke(&self) {
-        unimplemented!("invoke");
+    fn invoke(&self, benchmark: &Benchmark) {
+        let _ = Command::new(&self.interp_path)
+            .arg(benchmark.path())
+            .args(benchmark.args())
+            .envs(&self.env)
+            .output()
+            .expect("failed to execute process");
     }
 }
 
@@ -71,7 +79,7 @@ impl LangImpl for GenericNativeCode {
         unimplemented!("results_key");
     }
 
-    fn invoke(&self) {
+    fn invoke(&self, _benchmark: &Benchmark) {
         unimplemented!("invoke");
     }
 }

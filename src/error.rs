@@ -12,4 +12,6 @@
 #[derive(Debug)]
 pub enum K2Error {
     Unknown,
+    ExecutionFailed,
+    RerunError,
 }

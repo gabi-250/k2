@@ -11,3 +11,6 @@ path = "src/lib.rs"
 [dependencies]
 clap = "2.33.0"
 which = "2.0.1"
+libc = { version = "0.2.62", default-features = false }
+rand = { version = "0.7", features = ["small_rng"]}
+rusqlite = "0.20.0"

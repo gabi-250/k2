@@ -26,11 +26,14 @@ fn main() {
     let pypy = GenericScriptingVm::new(&pypy_bin);
     let luajit = GenericScriptingVm::new(&luajit_bin);
     let cpython_bench = Benchmark::new("./benchmarks/binarytrees/binarytrees.py", &cpython)
-        .tag("benchmark_name", "binarytrees");
+        .tag("benchmark_name", "binarytrees")
+        .arg("10".into());
     let pypy_bench = Benchmark::new("./benchmarks/binarytrees/binarytrees.py", &pypy)
-        .tag("benchmark_name", "binarytrees");
+        .tag("benchmark_name", "binarytrees")
+        .arg("10".into());
     let lua_bench = Benchmark::new("./benchmarks/binarytrees/binarytrees.lua", &luajit)
         .tag("benchmark_name", "binarytrees")
+        .arg("12".into())
         .stack_lim(Limit::KiB(8.192))
         .heap_lim(Limit::GiB(2.097152));
     let exp = expb
@@ -38,12 +41,11 @@ fn main() {
         .benchmark(&pypy_bench)
         .benchmark(&lua_bench)
         .build();
-    // `run` outputs the result in the k2 internal format.
     let _ = exp.run().expect("Failed to run the experiment");
 }
 
 fn setup<'a>() -> ExperimentBuilder<'a> {
-    let expb = parse_args(ExperimentBuilder::new());
+    let expb = parse_args(ExperimentBuilder::new("simple_experiment"));
     // These could've been command-line arguments too.
     expb.pexecs(2).in_proc_iters(40)
 }

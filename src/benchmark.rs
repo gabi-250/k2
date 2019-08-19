@@ -8,8 +8,7 @@
 // at your option. This file may not be copied, modified, or distributed except according to those
 // terms.
 
-use crate::lang_impl::LangImpl;
-use crate::limit::Limit;
+use crate::{config::Config, error::K2Error, lang_impl::LangImpl, limit::Limit};
 
 use std::collections::HashMap;
 
@@ -26,6 +25,8 @@ pub type TagStore = HashMap<String, String>;
 /// implementations the benchmark will be run on.
 pub struct Benchmark<'a> {
     tags: TagStore,
+    /// The command-line arguments passed to this benchmark.
+    args: Vec<String>,
     lang_impl: &'a dyn LangImpl,
     /// The stack size limit. `None` by default.
     pub stack_lim: Option<Limit>,
@@ -38,6 +39,7 @@ impl<'a> Benchmark<'a> {
     pub fn new(path: &str, lang_impl: &'a dyn LangImpl) -> Benchmark<'a> {
         let b = Benchmark {
             tags: Default::default(),
+            args: Default::default(),
             lang_impl,
             stack_lim: None,
             heap_lim: None,
@@ -47,9 +49,34 @@ impl<'a> Benchmark<'a> {
         b.tag("path", path)
     }
 
+    pub(crate) fn run(&self, _config: &Config) -> Result<(), K2Error> {
+        self.lang_impl.invoke(self);
+        Ok(())
+    }
+
+    pub fn results_key(&self) -> String {
+        format!("{}:{}", self.lang_impl.results_key(), self.path())
+    }
+
+    /// Get all the arguments passed to this benchmark.
+    pub fn args(&self) -> &Vec<String> {
+        &self.args
+    }
+
+    /// Add an argument to pass to the benchmark.
+    pub fn arg(mut self, arg: String) -> Self {
+        self.args.push(arg);
+        self
+    }
+
     /// The path of the benchmark.
     pub fn path(&self) -> &str {
         self.tags.get(TAG_PATH).expect("Benchmark path not set.")
+    }
+
+    /// Retrieve the tags recorded for this benchmark.
+    pub fn tags(&self) -> &TagStore {
+        &self.tags
     }
 
     /// Add tag `t` with value `val`.
@@ -63,7 +90,7 @@ impl<'a> Benchmark<'a> {
         &self
             .tags
             .get(t)
-            .expect(&format!("Tag key {} doesn't have an associated value!", t))
+            .unwrap_or_else(|| panic!("Tag key {} doesn't have an associated value!", t))
     }
 
     /// Check if the value of the tag identified by `t` matches `val`.

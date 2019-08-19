@@ -10,8 +10,10 @@
 
 pub mod benchmark;
 pub mod config;
+pub mod db;
 pub mod error;
 pub mod experiment;
 pub mod lang_impl;
 pub mod limit;
+pub mod manifest;
 pub mod util;
