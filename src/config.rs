@@ -8,13 +8,13 @@
 // at your option. This file may not be copied, modified, or distributed except according to those
 // terms.
 
-use std::time::Duration;
+use std::{path::PathBuf, time::Duration};
 
 /// The configuration that specifies how to run the benchmarks.
 #[derive(Debug)]
 pub(crate) struct Config {
-    /// The path of the result file.
-    pub result_path: String,
+    /// The path of the directory where to store the results and the manifest.
+    pub results_dir: PathBuf,
     /// Run the benchmarks in quick mode (for development/testing purposes).
     pub quick: bool,
     /// Don't actually run the benchmarks (for development/testing purposes).
@@ -32,9 +32,9 @@ pub(crate) struct Config {
 }
 
 impl Config {
-    pub fn new() -> Config {
+    pub fn new(results_dir: PathBuf) -> Config {
         Config {
-            result_path: "default/path".to_string(),
+            results_dir,
             quick: false,
             dry_run: false,
             reboot: false,
